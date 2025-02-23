@@ -1,0 +1,36 @@
+.upload-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 2px solid #fff;
+    background-color: #000;
+}
+
+.upload-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 2px solid #fff;
+}
+
+.upload-item .controls button {
+    background: #222;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+}
+
+.upload-item .controls button:hover {
+    background: #555;
+}
+
+.upload-item .controls a button {
+    margin-top: 10px;
+}

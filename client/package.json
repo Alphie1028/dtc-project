@@ -1,5 +1,5 @@
 {
-  "name": "vite-project",
+  "name": "client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "audiobuffer-to-wav": "^1.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tone": "^15.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@types/audiobuffer-to-wav": "^1.0.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react-swc": "^3.5.0",
