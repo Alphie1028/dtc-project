@@ -18,29 +18,32 @@ const FileUpload: React.FC = () =>{
         }
     };
 
-    const handleUpload = async () =>{
-        if(!selectedFiles.length) return;
-            const formData = new FormData();
-            selectedFiles.forEach(file => {
-                formData.append('image', file);
-            });
-        try{
-            const response = await fetch('https://image-to-sound-a8815254e80a.herokuapp.com/upload', {
-                method: 'POST',
-                body: formData,
-            });
-            const data = await response.json();
-            if (data.success && data.results){
-                setUploadResults(prevResults => [...prevResults, ...data.results]);
-            }
-        }catch (error){
-        console.error('Error uploading files:', error);
+const API_BASE_URL = 'https://image-to-sound-a8815254e80a.herokuapp.com'
+
+const handleUpload = async () => {
+    if (!selectedFiles.length) return;
+    const formData = new FormData();
+    selectedFiles.forEach(file => {
+        formData.append('image', file);
+    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await response.json();
+        if (data.success && data.results) {
+            setUploadResults(prevResults => [...prevResults, ...data.results]);
         }
-    };
+    } catch (error) {
+        console.error('Error uploading files:', error);
+    }
+};
+
 
     useEffect(() =>{
         const handleBeforeUnload = () =>{
-            fetch('http://localhost:5000/cleanup', { method: 'DELETE' }).catch(err =>
+            fetch(`${API_BASE_URL}/cleanup`, { method: 'DELETE' }).catch(err =>
                 console.error('Cleanup error:', err)
             );
         };
@@ -60,8 +63,8 @@ const FileUpload: React.FC = () =>{
                 {uploadResults.map((result, index) =>(
                     <UploadItem
                         key={index}
-                        imageUrl={`src/assets/${result.originalImage}`}
-                        mp3Url={`src/assets/${result.mp3File}`}
+                        imageUrl={`${API_BASE_URL}/uploads/${result.originalImage}`}
+                        mp3Url={`${API_BASE_URL}/uploads/${result.mp3File}`}
                         mp3FileName={result.mp3File}
                     />
                 ))}
