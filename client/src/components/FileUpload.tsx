@@ -25,7 +25,7 @@ const FileUpload: React.FC = () =>{
                 formData.append('images', file);
             });
         try{
-            const response = await fetch('/upload', {
+            const response = await fetch('https://image-to-sound-a8815254e80a.herokuapp.com/upload', {
                 method: 'POST',
                 body: formData,
             });
