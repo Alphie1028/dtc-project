@@ -27,7 +27,7 @@ const UploadItem: React.FC<UploadItemProps> = ({ imageUrl, mp3Url, mp3FileName }
 
     return (
         <div className="upload-item">
-            <img src={imageUrl} alt="Uploaded" onError={(e) => (e.currentTarget.src = '/fallback-image.jpg')} />
+            <img src={imageUrl} alt="Uploaded"/>
             <div className="controls">
                 <audio ref={audioRef} src={mp3Url} preload="auto" />
                 <button onClick={handlePlay}>Play</button>
