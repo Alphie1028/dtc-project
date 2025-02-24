@@ -61,6 +61,7 @@ const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+app.use('/uploads', express.static(uploadDir));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -72,8 +73,6 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-
-app.use('/uploads', express.static(uploadDir));
 
 //Upload Route
 app.post('/upload', upload.single('image'), async (req, res) => {
