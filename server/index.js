@@ -57,12 +57,13 @@ for(let i = 0; i < 100; i++){
 let generatedFiles = [];
 
 //Set up multer storage
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -70,79 +71,57 @@ const storage = multer.diskStorage({
     cb(null, uniqueName);
   },
 });
-
 const upload = multer({ storage });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadDir));
+
 //Upload Route
-app.post('/upload', upload.array('images', 10), async (req, res) =>{
-  try{
-    const files = req.files;
-    if (!files || files.length === 0){
-      return res.status(400).send('No files uploaded');
-    }
-
-    const results = [];
-
-    for(const file of files){
-        const filePath = file.path;
-
-        //Resize image and get raw pixel data
-        const width = 100;
-        const height = 100;
-        const {data, info} = await sharp(filePath)
-            .resize(width, height)
-            .raw()
-            .toBuffer({resolveWithObject: true});
-
-        //Generate audio buffer using scale
-        const audioBuffer = generateAudioFromImage(data, info.width, info.height, info.channels);
-
-        //Write raw PCM data to a temp file
-        const rawFileName = Date.now() + '-' + Math.round(Math.random() * 1e9) + '.raw';
-        const rawFilePath = path.join(__dirname, rawFileName);
-        fs.writeFileSync(rawFilePath, audioBuffer);
-
-        //Convert raw PCM to MP3
-        const mp3Name = 'audio-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + '.mp3';
-        const mp3FilePath = path.join(__dirname, '../client/src/assets', mp3Name);
-
-        await new Promise((resolve, reject) =>{
-            ffmpeg(rawFilePath)
-                .inputFormat('s16le')
-                .audioFrequency(44100)
-                .audioChannels(1)
-                .audioCodec('libmp3lame')
-                .format('mp3')
-                .on('end', () => {
-                    //Cleanup
-                    fs.unlink(rawFilePath, (err) =>{
-                    if (err) console.error('Error deleting raw file:', err);
-                    });
-
-                    //Store file paths for cleanup later
-                    generatedFiles.push(filePath);     //original image
-                    generatedFiles.push(mp3FilePath); //generated MP3
-
-                    results.push({
-                    originalImage: path.basename(filePath),
-                    mp3File: mp3Name,
-                    });
-                    resolve();
-                })
-                .on('error', (err) =>{
-                    console.error('Error during conversion:', err);
-                    reject(err);
-                })
-                .save(mp3FilePath);
-            });
-        }
-            res.json({ success: true, results });
-        }catch(err){
-            console.error('Processing error:', err);
-        res.status(500).send('Server error');
-        }
-    });
+app.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+    const filePath = req.file.path;
+    // Resize the image and extract raw pixel data
+    const width = 100;
+    const height = 100;
+    const { data, info } = await sharp(filePath)
+      .resize(width, height)
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    
+    // Generate audio PCM buffer from the image data
+    const audioBuffer = generateAudioFromImage(data, info.width, info.height, info.channels);
+    
+    // Write raw PCM data to a temporary file in uploads
+    const rawFile = path.join(uploadDir, `output-${Date.now()}.raw`);
+    fs.writeFileSync(rawFile, audioBuffer);
+    
+    // Generate a unique mp3 filename in uploads
+    const mp3FileName = `audio-${Date.now()}-${Math.round(Math.random() * 1E9)}.mp3`;
+    const mp3File = path.join(uploadDir, mp3FileName);
+    
+    // Convert the raw PCM file to MP3 using ffmpeg
+    ffmpeg(rawFile)
+      .inputFormat('s16le')
+      .audioFrequency(44100)
+      .audioChannels(1)
+      .audioCodec('libmp3lame')
+      .format('mp3')
+      .on('end', () => {
+        // Remove the temporary raw file and the uploaded image
+        fs.unlink(rawFile, err => { if (err) console.error("Error deleting raw file:", err); });
+        fs.unlink(filePath, err => { if (err) console.error("Error deleting image file:", err); });
+        // Respond with the MP3 file URL (relative to your server)
+        res.json({ success: true, mp3Path: `/uploads/${mp3FileName}` });
+      })
+      .on('error', (err) => {
+        console.error('Error during conversion:', err);
+        res.status(500).send('Conversion error');
+      })
+      .save(mp3File);
+  } catch (err) {
+    console.error('Processing error:', err);
+    res.status(500).send('Server error');
+  }
+});
 
 //Cleanup Route
 app.delete('/cleanup', (req, res) =>{
