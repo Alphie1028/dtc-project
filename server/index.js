@@ -10,6 +10,13 @@ ffmpeg.setFfmpegPath(ffmpegStatic);
 const app = express();
 app.use(cors());
 
+const clientBuildPath = path.join(__dirname, '../client/build');
+app.use(express.static(clientBuildPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
+
 const baseScaleOptions = [
   [0, 2, 4, 7, 9],         //Major pentatonic
   [0, 3, 5, 7, 10],        //Minor pentatonic
