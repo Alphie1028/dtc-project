@@ -10,15 +10,15 @@ ffmpeg.setFfmpegPath(ffmpegStatic);
 const app = express();
 app.use(cors());
 
-const clientBuildPath = path.join(__dirname, '../client/build');
-app.use(express.static(clientBuildPath));
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
+  res.sendFile(path.join(clientDistPath, 'index.html'));
 });
+
 const helmet = require('helmet');
 
-// Configure Helmet with a custom CSP policy
 app.use(
   helmet.contentSecurityPolicy({
     useDefaults: false, // disable Helmet's default settings
