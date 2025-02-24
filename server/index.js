@@ -16,6 +16,23 @@ app.use(express.static(clientBuildPath));
 app.get('*', (req, res) => {
   res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
+const helmet = require('helmet');
+
+// Configure Helmet with a custom CSP policy
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: false, // disable Helmet's default settings
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      // add any other directives as needed
+    },
+  })
+);
+
 
 const baseScaleOptions = [
   [0, 2, 4, 7, 9],         //Major pentatonic
