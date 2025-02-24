@@ -110,7 +110,11 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         fs.unlink(rawFile, err => { if (err) console.error("Error deleting raw file:", err); });
         fs.unlink(filePath, err => { if (err) console.error("Error deleting image file:", err); });
         // Respond with the MP3 file URL (relative to your server)
-        res.json({ success: true, mp3Path: `/uploads/${mp3FileName}` });
+        res.json({ 
+            success: true, 
+            results: [{ originalImage: req.file.filename, mp3File: mp3FileName }] 
+        });
+
       })
       .on('error', (err) => {
         console.error('Error during conversion:', err);
