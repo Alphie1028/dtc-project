@@ -1,0 +1,10 @@
+{
+  "homepage": "https://Alphie1028.github.io/dtc-project",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
