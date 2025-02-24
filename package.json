@@ -1,0 +1,20 @@
+{
+  "name": "dtc-project",
+  "version": "1.0.0",
+  "description": "By: Brennan Mulligan",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alphie1028/dtc-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alphie1028/dtc-project/issues"
+  },
+  "homepage": "https://github.com/Alphie1028/dtc-project#readme"
+}
