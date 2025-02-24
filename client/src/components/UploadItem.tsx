@@ -8,6 +8,9 @@ interface UploadItemProps{
 }
 
 const UploadItem: React.FC<UploadItemProps> = ({ imageUrl, mp3Url, mp3FileName }) => {
+    console.log("Image URL:", imageUrl);
+    console.log("MP3 URL:", mp3Url);
+
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const handlePlay = () => {
